@@ -10,7 +10,7 @@ class Robot(object):
         from view import rootWindow
         self.coordinate_list = coordinate_list
         self.impassable_coordinate_list = impassable_coordinate_list
-        self.start_coordinate = (0, 0)
+        self.start_coordinate = (5, 5)
         self.current_coordinate = self.start_coordinate
         self.path_log = []
         self.path_log.append(self.start_coordinate)
@@ -42,20 +42,19 @@ Robot.judge_right_passed = judge_right_passed
 
 # A*
 Robot.get_uncleaned_coordinate_list = get_uncleaned_coordinate_list
+Robot.a_star_search = a_star_search
 
 # GO U_TURN
 robot.u_turn_toward_right()
+robot.u_turn_toward_left()
 
 # print(robot.path_log)
 # print(len(robot.path_log))
 
+while len(get_passed_by_coordinate_list(robot)) > 1:
+    a_star_result_merge(robot)
+a_star_result_merge(robot)
 
-# find unclear area
-# uncleaned_coordinate_list = get_uncleaned_coordinate_list(robot)
-robot.path_log.append((2, 0))
-robot.current_coordinate = (2, 0)
-result = get_nearest_uncleaned_coordinate(robot)
-print(result)
 
 # UI
 show_window(robot.impassable_coordinate_list, robot.path_log)

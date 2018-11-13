@@ -35,9 +35,9 @@ def show_window(impassable_coordinate_list, path_log):
 
     pre_step = path_log[0]
     for step in path_log:
-        rootWindow.after(100, update(pre_step[0], pre_step[1], "cyan4"))
+        rootWindow.after(30, update(pre_step[0], pre_step[1], "cyan4"))
         pre_step = step
-        rootWindow.after(100, update(step[0], step[1], "chartreuse1"))
+        rootWindow.after(30, update(step[0], step[1], "chartreuse1"))
         rootWindow.update()
 
     rootWindow.mainloop()
