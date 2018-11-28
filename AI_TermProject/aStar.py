@@ -128,11 +128,13 @@ def a_star_search(robot, goal):
                 priority = new_cost + heuristic(goal, next)
                 frontier.put(next, priority)
                 came_from[next] = current
-                if current not in road_map:
-                    road_map.append(current)
 
-    road_map.append(goal)
-    return road_map
+    current = goal
+    while current != start:
+        road_map.append(current)
+        current = came_from[current]
+
+    return reversed(road_map)
 
 
 def a_star_result_merge(robot):
