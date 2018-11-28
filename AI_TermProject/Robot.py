@@ -48,13 +48,8 @@ Robot.a_star_search = a_star_search
 robot.u_turn_toward_right()
 robot.u_turn_toward_left()
 
-# print(robot.path_log)
-# print(len(robot.path_log))
-
-while len(get_passed_by_coordinate_list(robot)) > 1:
+while len(get_uncleaned_coordinate_list(robot)) > 0:
     a_star_result_merge(robot)
-a_star_result_merge(robot)
-
 
 # UI
 show_window(robot.impassable_coordinate_list, robot.path_log)
