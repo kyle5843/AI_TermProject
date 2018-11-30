@@ -10,7 +10,7 @@ class Robot(object):
         from view import rootWindow
         self.coordinate_list = coordinate_list
         self.impassable_coordinate_list = impassable_coordinate_list
-        self.start_coordinate = (5, 5)
+        self.start_coordinate = (27, 24)
         self.current_coordinate = self.start_coordinate
         self.path_log = []
         self.path_log.append(self.start_coordinate)
@@ -46,10 +46,11 @@ Robot.a_star_search = a_star_search
 
 # GO U_TURN
 robot.u_turn_toward_right()
-robot.u_turn_toward_left()
+# robot.u_turn_toward_left()
 
 while len(get_uncleaned_coordinate_list(robot)) > 0:
     a_star_result_merge(robot)
+a_star_back_to_home(robot)
 
 # UI
 show_window(robot.impassable_coordinate_list, robot.path_log)

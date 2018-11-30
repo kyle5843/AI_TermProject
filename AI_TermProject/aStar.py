@@ -143,3 +143,10 @@ def a_star_result_merge(robot):
     for coordinate in road_map:
         robot.path_log.append(coordinate)
     robot.current_coordinate = goal
+
+
+def a_star_back_to_home(robot):
+    road_map = a_star_search(robot, robot.start_coordinate)
+    for coordinate in road_map:
+        robot.path_log.append(coordinate)
+    robot.current_coordinate = robot.start_coordinate
