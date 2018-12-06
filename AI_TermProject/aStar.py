@@ -47,19 +47,41 @@ def get_manhanttan_distance(coordinate1, coordinate2):
     return np.abs(np.array(coordinate1) - np.array(coordinate2)).sum()
 
 
-def find_nearest_coordinate_by_manhanttan(coordinate1, coordinate_list):
+def find_nearest_coordinate_by_manhanttan(coordinate1, coordinate_list, self):
     record = 10000000
     for coordinate2 in coordinate_list:
-        distance = get_manhanttan_distance(coordinate1, coordinate2)
+        distance = get_manhanttan_distance(coordinate1, coordinate2) - getWeight(self, coordinate2)
         if distance < record:
             record = distance
             result = coordinate2
     return result
 
 
+def getWeight(self, coordinate2):
+    weight = 0
+    x, y = coordinate2
+    left_coordinate = (x - 1, y)
+    right_coordinate = (x + 1, y)
+    up_coordinate = (x, y + 1)
+    down_coordinate = (x, y - 1)
+    if left_coordinate not in self.coordinate_list or (left_coordinate in self.impassable_coordinate_list) or left_coordinate in self.path_log:
+        weight = weight + 1
+    if right_coordinate not in self.coordinate_list or (right_coordinate in self.impassable_coordinate_list) or right_coordinate in self.path_log:
+        weight = weight + 1
+    if up_coordinate not in self.coordinate_list or (up_coordinate in self.impassable_coordinate_list) or up_coordinate in self.path_log:
+        weight = weight + 1
+    if down_coordinate not in self.coordinate_list or (down_coordinate in self.impassable_coordinate_list) or down_coordinate in self.path_log:
+        weight = weight + 1
+
+    if weight == 4 or weight == 3:
+        return 2.5
+    else:
+        return 0
+
+
 def get_nearest_uncleaned_coordinate(self):
     passed_by_coordinate_list = get_passed_by_coordinate_list(self)
-    return find_nearest_coordinate_by_manhanttan(self.current_coordinate, passed_by_coordinate_list)
+    return find_nearest_coordinate_by_manhanttan(self.current_coordinate, passed_by_coordinate_list, self)
 
 
 def heuristic(a, b):

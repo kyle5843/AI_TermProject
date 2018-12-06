@@ -26,6 +26,13 @@ def move_right(self):
     self.path_log.append(self.current_coordinate)
 
 
+def u_turn(self):
+    if self.judge_up_passable() is True or self.judge_right_passable() is True or self.judge_down_passable():
+        self.u_turn_toward_right()
+    elif self.judge_up_passable() is True or self.judge_left_passable() is True or self.judge_down_passable():
+        self.u_turn_toward_left()
+
+
 def u_turn_toward_right(self):
     rollback = False
     while True:
@@ -67,9 +74,7 @@ def u_turn_toward_left(self):
                 self.move_up()
             if self.judge_left_passable() is True and self.judge_left_passed() is False:
                 self.move_left()
-                rollback = True
-            else:
-                rollback = True
+            rollback = True
 
         if rollback is True:
             while self.judge_down_passable() is True and self.judge_down_passed() is False:

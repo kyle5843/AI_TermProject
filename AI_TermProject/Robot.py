@@ -27,6 +27,7 @@ Robot.move_up = move_up
 Robot.move_down = move_down
 Robot.move_left = move_left
 Robot.move_right = move_right
+Robot.u_turn = u_turn
 Robot.u_turn_toward_right = u_turn_toward_right
 Robot.u_turn_toward_left = u_turn_toward_left
 
@@ -45,12 +46,15 @@ Robot.get_uncleaned_coordinate_list = get_uncleaned_coordinate_list
 Robot.a_star_search = a_star_search
 
 # GO U_TURN
-robot.u_turn_toward_right()
-# robot.u_turn_toward_left()
+robot.u_turn()
+
 
 while len(get_uncleaned_coordinate_list(robot)) > 0:
     a_star_result_merge(robot)
+    robot.u_turn()
 a_star_back_to_home(robot)
+
+print(len(robot.path_log))
 
 # UI
 show_window(robot.impassable_coordinate_list, robot.path_log)
