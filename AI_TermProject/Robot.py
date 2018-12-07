@@ -2,6 +2,7 @@ from sensor import *
 from motion import *
 from view import *
 from aStar import *
+from AI_GUI_1071129 import *
 
 
 class Robot(object):
@@ -18,6 +19,7 @@ class Robot(object):
 
 
 robot = Robot()
+mainWindow = Ui_MainWindow()
 
 if __name__ == '__main__':
     pass
@@ -58,6 +60,7 @@ print(len(robot.path_log))
 
 # UI
 show_window(robot.impassable_coordinate_list, robot.path_log)
+
 
 
 

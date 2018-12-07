@@ -6,6 +6,7 @@
 #
 # WARNING! All changes made in this file will be lost!
 
+import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 class Ui_MainWindow(object):
@@ -291,3 +292,15 @@ class Ui_MainWindow(object):
         self.pushButton_9.setText(_translate("MainWindow", "更新狀態"))
         self.label_18.setText(_translate("MainWindow", "目前時間"))
 
+
+class MyWindow(QtWidgets.QMainWindow, Ui_MainWindow):
+    def __init__(self):
+        super(MyWindow, self).__init__()
+        self.setupUi(self)
+
+
+if __name__ == '__main__':
+    app = QtWidgets.QApplication(sys.argv)
+    mywindow = MyWindow()
+    mywindow.show()
+    sys.exit(app.exec_())
