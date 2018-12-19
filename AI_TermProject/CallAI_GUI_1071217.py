@@ -5,11 +5,14 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from AI_GUI_1071216 import *
+from Robot import *
 
 class MyMainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):    
         super(MyMainWindow, self).__init__(parent)
         self.setupUi(self)
+        self.robot = Robot()
+
 #以下為自定義的函數及新增內容
         self.BtnInputMap.clicked.connect(self.GetFile)
         self.BtnRenew.clicked.connect(self.GetValue)
@@ -17,7 +20,13 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.BtnDown.clicked.connect(self.Down)
         self.BtnRight.clicked.connect(self.Right)
         self.BtnLeft.clicked.connect(self.Left)
+        self.BtnStart.clicked.connect(self.Start)
 #        self.BtnAddTime.clicked.connect(self.AddTimeList)
+
+# 跑路徑
+    def Start(self):
+        self.robot.getPath()
+        print(len(self.robot.path_log))
         
 #輸入圖片，設定檔案格式及開啟C槽根目錄下的檔案
 #Map=Qlabel  (因為QWidget與QGraphicView沒有支援QPixmap)
@@ -81,22 +90,25 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
     
 #在地圖上面顯示掃地的路徑，並回傳到GUI的Map參數上面
 #目前有這個功能，但是在另一個視窗= ="
-class Drawing(QWidget): 
-	def paintEvent(self, e): 
-		Map=QPainter()
-		Map.begin(self)
-		self.drawLines(Map)
-		Map.end()
-	def drawLines(self, Map): 
-		brush = QBrush(Qt.SolidPattern)
-		Map.setBrush(brush) #設定畫筆風格
-		Map.drawRect(10, 15, 20, 40)#畫矩形(x,y,w,h)
+class Drawing(QWidget):
+    def paintEvent(self, e):
+        Map = QPainter()
+        Map.begin(self)
+        self.drawLines(Map)
+        Map.end()
 
-if __name__=="__main__":  
-    app = QApplication(sys.argv)  
-    myWin = MyMainWindow()  
+    def drawLines(self, Map):
+        brush = QBrush(Qt.SolidPattern)
+        Map.setBrush(brush)  # 設定畫筆風格
+        Map.drawRect(10, 15, 20, 40)  # 畫矩形(x,y,w,h)
+
+
+if __name__=="__main__":
+    app = QApplication(sys.argv)
+    myWin = MyMainWindow()
     myWin.show()  
-    demo=Drawing()
-    demo.show()
+    # demo = Drawing()
+    # myWin.layout().addWidget(demo)
+
     sys.exit(app.exec_())  
 

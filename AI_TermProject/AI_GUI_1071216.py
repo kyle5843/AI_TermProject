@@ -7,6 +7,8 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtGui import QPainter
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -238,6 +240,8 @@ class Ui_MainWindow(object):
         font.setPointSize(15)
         self.Map.setFont(font)
         self.Map.setObjectName("Map")
+        self.Map.setStyleSheet("background-color: white")
+        self.paintMap = QPainter(self.centralwidget)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 1017, 25))
