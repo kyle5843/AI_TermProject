@@ -234,7 +234,7 @@ class Ui_MainWindow(object):
         self.label_19.setGeometry(QtCore.QRect(20, 530, 71, 23))
         self.label_19.setObjectName("label_19")
         self.Map = QtWidgets.QLabel(self.centralwidget)
-        self.Map.setGeometry(QtCore.QRect(20, 70, 621, 431))
+        self.Map.setGeometry(QtCore.QRect(60, 70, 504, 431))
         font = QtGui.QFont()
         font.setPointSize(15)
         self.Map.setFont(font)
@@ -304,5 +304,5 @@ class Ui_MainWindow(object):
         self.BtnStart.setText(_translate("MainWindow", "開始打掃"))
         self.label_18.setText(_translate("MainWindow", "目前時間"))
         self.label_19.setText(_translate("MainWindow", "目前位置"))
-        self.Map.setText(_translate("MainWindow", "地圖在此(若檔案太小無法變大)"))
+        # self.Map.setText(_translate("MainWindow", "地圖在此(若檔案太小無法變大)"))
 

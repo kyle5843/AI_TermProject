@@ -11,7 +11,11 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):    
         super(MyMainWindow, self).__init__(parent)
         self.setupUi(self)
+
+        #robot
         self.robot = Robot()
+        self.tag = 0
+        self.timer = QTimer(self)
 
 #以下為自定義的函數及新增內容
         self.BtnInputMap.clicked.connect(self.GetFile)
@@ -26,15 +30,38 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 # 跑路徑
     def Start(self):
         self.robot.getPath()
-        print(len(self.robot.path_log))
+        self.timer.timeout.connect(self.move)
+        self.timer.start(30)
+
+    def move(self):
+        if self.tag < len(self.robot.path_log):
+            if (self.tag-1) >= 0:
+                pre_step = self.robot.path_log[self.tag-1]
+                self.drawMap(pre_step[0], pre_step[1], "background-color: darkcyan")
+            step = self.robot.path_log[self.tag]
+            self.drawMap(step[0], step[1], "background-color: deeppink")
+            self.tag = self.tag + 1
+        else:
+            self.tag = 0
+            self.timer.stop()
+            print("over")
+
+
+    def drawMap(self, posX, posY, color):
+        self.lableX = QtWidgets.QLabel(self.layoutWidget)
+        self.lableX.setGeometry(QtCore.QRect(60 + 14*posX, 70 + 14*posY, 14, 14))
+        self.lableX.setStyleSheet(color)
+        self.layout().addWidget(self.lableX)
         
 #輸入圖片，設定檔案格式及開啟C槽根目錄下的檔案
 #Map=Qlabel  (因為QWidget與QGraphicView沒有支援QPixmap)
 #但是下面要畫矩形需要QWidget...
 #不知道有沒有東西是支援兩種的
     def GetFile(self):
-        fname,_=QFileDialog.getOpenFileName(self, 'Open file', 'C:\\',"Image files (*.jpg *.gif)")
-        self.Map.setPixmap(QPixmap(fname))
+        # fname,_=QFileDialog.getOpenFileName(self, 'Open file', 'C:\\',"Image files (*.jpg *.gif)")
+        # self.Map.setPixmap(QPixmap(fname))
+        for impassable in self.robot.impassable_coordinate_list:
+            self.drawMap(impassable[0], impassable[1], "background-color: black")
 
 #取出RenowXYZABC的數值，回傳給NowX.Y.Z.A.B.C
     def GetValue(self):
@@ -106,9 +133,7 @@ class Drawing(QWidget):
 if __name__=="__main__":
     app = QApplication(sys.argv)
     myWin = MyMainWindow()
-    myWin.show()  
-    # demo = Drawing()
-    # myWin.layout().addWidget(demo)
+    myWin.show()
 
     sys.exit(app.exec_())  
 
