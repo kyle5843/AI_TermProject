@@ -135,5 +135,8 @@ if __name__=="__main__":
     myWin = MyMainWindow()
     myWin.show()
 
+    print(myWin.robot.coordinate_data[0][1])
+    print(myWin.robot.coordinate_data[0][1]['b'])
+
     sys.exit(app.exec_())  
 

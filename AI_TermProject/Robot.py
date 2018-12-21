@@ -5,7 +5,8 @@ from aStar import *
 
 class Robot(object):
     def __init__(self) -> object:
-        from map_test import coordinate_list, impassable_coordinate_list
+        from map_test import coordinate_list, impassable_coordinate_list, coordinate_data
+        self.coordinate_data = coordinate_data
         self.coordinate_list = coordinate_list
         self.impassable_coordinate_list = impassable_coordinate_list
         self.start_coordinate = (27, 24)

@@ -1,4 +1,5 @@
 import csv
+import json
 
 # map
 file = "map.csv"
@@ -16,3 +17,16 @@ for x in range(len(map)):
         if map[x][y] == '#':
             # reverse_x, reverse_y = y, len(map) - x - 1
             impassable_coordinate_list.append((y, x))
+
+
+with open('mapData.json') as f:
+    data = json.load(f)
+mapData = data['MapData']
+
+coordinate_data = [[0 for x in range(50)] for y in range(50)]
+for x in range(len(mapData)):
+    for y in range(len(mapData[x])):
+        posX = mapData[x][y]['x']
+        posY = mapData[x][y]['y']
+        coordinate_data[mapData[x][y]['x']][mapData[x][y]['y']] = mapData[x][y]
+
