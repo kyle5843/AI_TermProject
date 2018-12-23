@@ -17,7 +17,7 @@ def get_uncleaned_coordinate_list(self):
     return uncleaned_coordinate_list
 
 
-def multi_dim_intersect(coordinate_list_1, coordinate_list_2):  # 两个坐标集的交集
+def multi_dim_intersect(coordinate_list_1, coordinate_list_2):  # 兩个坐標集的交集
     coordinate_list_1, coordinate_list_2 = np.array(coordinate_list_1), np.array(coordinate_list_2)
     arr1_view = coordinate_list_1.view([('', coordinate_list_1.dtype)] * coordinate_list_1.shape[1])
     arr2_view = coordinate_list_2.view([('', coordinate_list_2.dtype)] * coordinate_list_2.shape[1])
@@ -43,14 +43,14 @@ def get_passed_by_coordinate_list(self):
     return passed_by_coordinate_list
 
 
-def get_manhanttan_distance(coordinate1, coordinate2):
+def get_manhattan_distance(coordinate1, coordinate2):
     return np.abs(np.array(coordinate1) - np.array(coordinate2)).sum()
 
 
-def find_nearest_coordinate_by_manhanttan(coordinate1, coordinate_list, self):
+def find_nearest_coordinate_by_manhattan(coordinate1, coordinate_list, self):
     record = 10000000
     for coordinate2 in coordinate_list:
-        distance = get_manhanttan_distance(coordinate1, coordinate2) - getWeight(self, coordinate2)
+        distance = get_manhattan_distance(coordinate1, coordinate2) - getWeight(self, coordinate2)
         if distance < record:
             record = distance
             result = coordinate2
@@ -81,7 +81,7 @@ def getWeight(self, coordinate2):
 
 def get_nearest_uncleaned_coordinate(self):
     passed_by_coordinate_list = get_passed_by_coordinate_list(self)
-    return find_nearest_coordinate_by_manhanttan(self.current_coordinate, passed_by_coordinate_list, self)
+    return find_nearest_coordinate_by_manhattan(self.current_coordinate, passed_by_coordinate_list, self)
 
 
 def heuristic(a, b):

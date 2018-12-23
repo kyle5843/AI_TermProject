@@ -4,7 +4,7 @@ import sys
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-from AI_GUI_1071216 import *
+from AI_GUI import *
 from Robot import *
 
 class MyMainWindow(QMainWindow, Ui_MainWindow):
@@ -12,12 +12,12 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         super(MyMainWindow, self).__init__(parent)
         self.setupUi(self)
 
-        #robot
+        # robot
         self.robot = Robot()
         self.tag = 0
         self.timer = QTimer(self)
 
-#以下為自定義的函數及新增內容
+        # 以下為自定義的函數及新增內容
         self.BtnInputMap.clicked.connect(self.GetFile)
         self.BtnRenew.clicked.connect(self.GetValue)
         self.BtnUp.clicked.connect(self.Up)
@@ -25,9 +25,10 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.BtnRight.clicked.connect(self.Right)
         self.BtnLeft.clicked.connect(self.Left)
         self.BtnStart.clicked.connect(self.Start)
-#        self.BtnAddTime.clicked.connect(self.AddTimeList)
+        self.BtnAddTime.clicked.connect(self.AddTimeList)
+        self.BtnDelTime.clicked.connect(self.DelTimeList)
 
-# 跑路徑
+    # 跑路徑
     def Start(self):
         self.robot.getPath()
         self.timer.timeout.connect(self.move)
@@ -45,7 +46,6 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             self.tag = 0
             self.timer.stop()
             print("over")
-
 
     def drawMap(self, posX, posY, color):
         self.lableX = QtWidgets.QLabel(self.layoutWidget)
@@ -82,7 +82,8 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         
         CValue=self.RenewC.text()
         self.NowC.setText(CValue)
-#按鍵上下左右控制掃地機器人(尚未完成)==========================
+
+    # 按鍵上下左右控制掃地機器人
     def Up(self):
         YValue=self.NowY.text()
         YValue=int(YValue)+1
@@ -103,16 +104,30 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         XValue=int(XValue)-1
         XValue=str(XValue)
         self.NowX.setText(XValue)
-#        YValue=int(YValue+1)      #這個是要怎麼加??????
- #       int (YValue, 10)=int(YValue, 10)+1
- #       a=int (YValue)
- #       YValue=int(a+1)
-#===========================================================
 
-#預約清掃功能(還在研究中)
-#   def AddTimeList(self):
-#        Time=text(dateTimeEdit)
-#        self.TimeList.setPlaintext(Time)
+    # 預約清掃功能(還沒有做鬧鐘功能)
+    def AddTimeList(self):
+        Year = self.dateTimeEdit.date().year()
+        Month = self.dateTimeEdit.date().month()
+        Day = self.dateTimeEdit.date().day()
+        Hour = self.dateTimeEdit.time().hour()
+        Minute = self.dateTimeEdit.time().minute()
+        print(Year, '年', Month, '月', Day, '日', Hour, '時', Minute, '分')
+        alarm = "%s年%s月%s日%s時%s分"%(Year, Month, Day, Hour, Minute)
+        self.listWidget.addItem(str(alarm))
+        # 要順便把加入的時間放到list或是array，方便之後做鬧鐘的功能
+        '''
+        #請參考https://blog.csdn.net/lmhuanying1012/article/details/78112907
+        QStringList data;
+        data << "Letter A" << "Letter B" << "Letter C";
+        model = new QStringListModel(this);
+        model->setStringList(data);
+        '''
+        # ===========================================================
+    def DelTimeList(self):
+        NowRow=self.listWidget.currentRow()
+        self.listWidget.takeItem(NowRow)
+    # '''
     
     
 #在地圖上面顯示掃地的路徑，並回傳到GUI的Map參數上面
