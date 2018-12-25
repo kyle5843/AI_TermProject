@@ -1,11 +1,11 @@
-from sensor import *
-from motion import *
-from aStar import *
+from Sensor import *
+from Motion import *
+from A_Star import *
 
 
 class Robot(object):
     def __init__(self) -> object:
-        from load_map import coordinate_list, impassable_coordinate_list, coordinate_data
+        from Load_Map import coordinate_list, impassable_coordinate_list, coordinate_data
         self.coordinate_data = coordinate_data
         self.coordinate_list = coordinate_list
         self.impassable_coordinate_list = impassable_coordinate_list
