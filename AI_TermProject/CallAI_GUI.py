@@ -19,6 +19,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
         # 以下為自定義的函數及新增內容
         self.BtnInputMap.clicked.connect(self.GetFile)
+        self.BtnClearMap.clicked.connect(self.clearMap)
         self.BtnRenew.clicked.connect(self.GetValue)
         self.BtnUp.clicked.connect(self.Up)
         self.BtnDown.clicked.connect(self.Down)
@@ -42,6 +43,9 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             step = self.robot.path_log[self.tag]
             self.drawMap(step[0], step[1], "background-color: deeppink")
             self.tag = self.tag + 1
+
+            # update data
+            self.Distance.setText(str(self.tag))
         else:
             self.tag = 0
             self.timer.stop()
@@ -52,6 +56,11 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.lableX.setGeometry(QtCore.QRect(60 + 14*posX, 70 + 14*posY, 14, 14))
         self.lableX.setStyleSheet(color)
         self.layout().addWidget(self.lableX)
+
+    def clearMap(self):
+        for coordinate in self.robot.coordinate_list:
+            x,y = coordinate
+            self.drawMap(x, y, "background-color: white")
         
 #輸入圖片，設定檔案格式及開啟C槽根目錄下的檔案
 #Map=Qlabel  (因為QWidget與QGraphicView沒有支援QPixmap)
