@@ -1,6 +1,7 @@
 from Sensor import *
 from Motion import *
 from A_Star import *
+from CleanSensor import *
 
 
 class Robot(object):
@@ -13,6 +14,8 @@ class Robot(object):
         self.current_coordinate = self.start_coordinate
         self.path_log = []
         self.path_log.append(self.start_coordinate)
+        self.clearArea = []
+        self.cleanSensor = CleanSensor()
 
         # motion
         Robot.move_up = move_up
@@ -45,6 +48,12 @@ class Robot(object):
             a_star_result_merge(self)
             self.u_turn()
         a_star_back_to_home(self)
+
+    def reset(self):
+        self.path_log = []
+        self.path_log.append(self.start_coordinate)
+        self.clearArea = []
+        self.current_coordinate = self.start_coordinate
 
 
 

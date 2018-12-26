@@ -1,6 +1,6 @@
-from load_map import coordinate_list, impassable_coordinate_list, coordinate_data
+from Load_Map import coordinate_list, impassable_coordinate_list, coordinate_data
 from Robot import *
-from motion import *
+from Motion import *
 
 
 class CleanSensor(object):
@@ -18,6 +18,9 @@ class CleanSensor(object):
     def Area(self):
         self.area=len(self.coordinate_list)-len(self.impassable_coordinate_list)
         return self.area
+
+    def getCleanAreaPercentage(self, robot):
+        return len(robot.clearArea) / self.Area()
 
     #需要掛在astar啟動時?   self.Distance.setText(str(self.CalDis()))
     def CalDis(self):

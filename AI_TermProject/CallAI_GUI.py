@@ -14,7 +14,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
         # robot
         self.robot = Robot()
-        self.tag = 0
+        self.move_distance = 0
         self.timer = QTimer(self)
 
         # 以下為自定義的函數及新增內容
@@ -36,20 +36,32 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.timer.start(30)
 
     def move(self):
-        if self.tag < len(self.robot.path_log):
-            if (self.tag-1) >= 0:
-                pre_step = self.robot.path_log[self.tag-1]
+        if self.move_distance < len(self.robot.path_log):
+            if (self.move_distance-1) >= 0:
+                pre_step = self.robot.path_log[self.move_distance-1]
                 self.drawMap(pre_step[0], pre_step[1], "background-color: darkcyan")
-            step = self.robot.path_log[self.tag]
+            step = self.robot.path_log[self.move_distance]
             self.drawMap(step[0], step[1], "background-color: deeppink")
-            self.tag = self.tag + 1
+            self.move_distance = self.move_distance + 1
+            self.updateStatus(step)
 
-            # update data
-            self.Distance.setText(str(self.tag))
         else:
-            self.tag = 0
+            self.move_distance = 0
             self.timer.stop()
-            print("over")
+
+    def updateStatus(self, step):
+        # update Status
+        self.Distance.setText(str(self.move_distance))
+        if step not in self.robot.clearArea:
+            self.robot.clearArea.append(step)
+            self.CleanArea.setText(str(len(self.robot.clearArea)))
+        self.GoalProbability.setText(str("%.0f%%" % (100 * self.robot.cleanSensor.getCleanAreaPercentage(self.robot))))
+        self.NowX.setText(str(step[0]))
+        self.NowY.setText(str(step[1]))
+        self.NowZ.setText(str(0))
+        self.NowA.setText(str(self.robot.coordinate_data[step[0]][step[1]]['a']))
+        self.NowB.setText(str(self.robot.coordinate_data[step[0]][step[1]]['b']))
+        self.NowC.setText(str(self.robot.coordinate_data[step[0]][step[1]]['c']))
 
     def drawMap(self, posX, posY, color):
         self.lableX = QtWidgets.QLabel(self.layoutWidget)
@@ -59,18 +71,25 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
     def clearMap(self):
         for coordinate in self.robot.coordinate_list:
-            x,y = coordinate
-            self.drawMap(x, y, "background-color: white")
-        
-#輸入圖片，設定檔案格式及開啟C槽根目錄下的檔案
-#Map=Qlabel  (因為QWidget與QGraphicView沒有支援QPixmap)
-#但是下面要畫矩形需要QWidget...
-#不知道有沒有東西是支援兩種的
+            if coordinate not in self.robot.impassable_coordinate_list:
+                x,y = coordinate
+                self.drawMap(x, y, "background-color: white")
+        self.Distance.setText("")
+        self.CleanArea.setText("")
+        self.GoalProbability.setText("")
+        self.NowX.setText("")
+        self.NowY.setText("")
+        self.NowZ.setText("")
+        self.NowA.setText("")
+        self.NowB.setText("")
+        self.NowC.setText("")
+        self.drawMap(self.robot.current_coordinate[0], self.robot.current_coordinate[1], "background-color: deeppink")
+        self.robot.reset()
+
     def GetFile(self):
-        # fname,_=QFileDialog.getOpenFileName(self, 'Open file', 'C:\\',"Image files (*.jpg *.gif)")
-        # self.Map.setPixmap(QPixmap(fname))
         for impassable in self.robot.impassable_coordinate_list:
             self.drawMap(impassable[0], impassable[1], "background-color: black")
+        self.drawMap(self.robot.start_coordinate[0], self.robot.start_coordinate[1], "background-color: deeppink")
 
 #取出RenowXYZABC的數值，回傳給NowX.Y.Z.A.B.C
     def GetValue(self):
@@ -91,6 +110,10 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         
         CValue=self.RenewC.text()
         self.NowC.setText(CValue)
+
+        self.robot.start_coordinate = (int(XValue), int(YValue))
+        self.robot.current_coordinate = (int(XValue), int(YValue))
+        self.clearMap()
 
     # 按鍵上下左右控制掃地機器人
     def Up(self):
