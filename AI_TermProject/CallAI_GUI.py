@@ -16,6 +16,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.robot = Robot()
         self.move_distance = 0
         self.timer = QTimer(self)
+        self.timer.timeout.connect(self.move)
 
         # 以下為自定義的函數及新增內容
         self.BtnInputMap.clicked.connect(self.GetFile)
@@ -32,7 +33,6 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
     # 跑路徑
     def Start(self):
         self.robot.getPath()
-        self.timer.timeout.connect(self.move)
         self.timer.start(30)
 
     def move(self):
@@ -89,14 +89,23 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
     def GetFile(self):
         for impassable in self.robot.impassable_coordinate_list:
             self.drawMap(impassable[0], impassable[1], "background-color: black")
-        x,y = self.robot.start_coordinate
+        x, y = self.robot.start_coordinate
         self.drawMap(x, y, "background-color: deeppink")
         self.NowX.setText(str(x))
         self.NowY.setText(str(y))
+        self.NowZ.setText(str(self.robot.coordinate_data[x][y]['z']))
+        self.NowA.setText(str(self.robot.coordinate_data[x][y]['a']))
+        self.NowB.setText(str(self.robot.coordinate_data[x][y]['b']))
+        self.NowC.setText(str(self.robot.coordinate_data[x][y]['c']))
+        self.repaint()
 
     def moveStartPoint(self):
         x = int(self.NowX.text())
         y = int(self.NowY.text())
+        self.NowZ.setText(str(self.robot.coordinate_data[x][y]['z']))
+        self.NowA.setText(str(self.robot.coordinate_data[x][y]['a']))
+        self.NowB.setText(str(self.robot.coordinate_data[x][y]['b']))
+        self.NowC.setText(str(self.robot.coordinate_data[x][y]['c']))
         self.drawMap(x, y, "background-color: deeppink")
         self.robot.start_coordinate = (x,y)
         self.robot.current_coordinate = (x,y)
@@ -134,6 +143,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             YValue=str(YValue)
             self.NowY.setText(YValue)
             self.moveStartPoint()
+            self.repaint()
 
     def Down(self):
         if self.robot.check_down():
@@ -143,6 +153,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             YValue=str(YValue)
             self.NowY.setText(YValue)
             self.moveStartPoint()
+            self.repaint()
 
     def Right(self):
         if self.robot.check_right():
@@ -152,6 +163,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             XValue=str(XValue)
             self.NowX.setText(XValue)
             self.moveStartPoint()
+            self.repaint()
 
     def Left(self):
         if self.robot.check_left():
@@ -161,6 +173,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             XValue=str(XValue)
             self.NowX.setText(XValue)
             self.moveStartPoint()
+            self.repaint()
 
     # 預約清掃功能(還沒有做鬧鐘功能)
     def AddTimeList(self):

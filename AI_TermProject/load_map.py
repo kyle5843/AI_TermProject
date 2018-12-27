@@ -28,5 +28,6 @@ for x in range(len(mapData)):
     for y in range(len(mapData[x])):
         posX = mapData[x][y]['x']
         posY = mapData[x][y]['y']
+        posY = abs(30 - posY - 1)
         coordinate_data[posX][posY] = mapData[x][y]
 
