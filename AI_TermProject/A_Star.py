@@ -172,3 +172,9 @@ def a_star_back_to_home(robot):
     for coordinate in road_map:
         robot.path_log.append(coordinate)
     robot.current_coordinate = robot.start_coordinate
+
+def a_star_point_to_point(robot, goal):
+    road_map = a_star_search(robot, goal)
+    for coordinate in road_map:
+        robot.path_log.append(coordinate)
+    robot.current_coordinate = robot.start_coordinate

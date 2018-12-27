@@ -13,7 +13,6 @@ class Robot(object):
         self.start_coordinate = (27, 24)
         self.current_coordinate = self.start_coordinate
         self.path_log = []
-        self.path_log.append(self.start_coordinate)
         self.clearArea = []
         self.cleanSensor = CleanSensor()
 
@@ -41,6 +40,7 @@ class Robot(object):
         Robot.a_star_search = a_star_search
 
     def getPath(self):
+        self.path_log.append(self.current_coordinate)
         # GO U_TURN
         self.u_turn()
 
@@ -51,11 +51,19 @@ class Robot(object):
 
     def reset(self):
         self.path_log = []
-        self.path_log.append(self.start_coordinate)
-        self.clearArea = []
         self.current_coordinate = self.start_coordinate
+        self.clearArea = []
 
+    def check_down(self):
+        return self.judge_up_passable()
 
+    def check_up(self):
+        return self.judge_down_passable()
 
+    def check_right(self):
+        return self.judge_right_passable()
+
+    def check_left(self):
+        return self.judge_left_passable()
 
 

@@ -46,7 +46,6 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             self.updateStatus(step)
 
         else:
-            self.move_distance = 0
             self.timer.stop()
 
     def updateStatus(self, step):
@@ -77,19 +76,30 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.Distance.setText("")
         self.CleanArea.setText("")
         self.GoalProbability.setText("")
-        self.NowX.setText("")
-        self.NowY.setText("")
+        self.NowX.setText(str(self.robot.current_coordinate[0]))
+        self.NowY.setText(str(self.robot.current_coordinate[1]))
         self.NowZ.setText("")
         self.NowA.setText("")
         self.NowB.setText("")
         self.NowC.setText("")
+        self.move_distance = 0
         self.drawMap(self.robot.current_coordinate[0], self.robot.current_coordinate[1], "background-color: deeppink")
         self.robot.reset()
 
     def GetFile(self):
         for impassable in self.robot.impassable_coordinate_list:
             self.drawMap(impassable[0], impassable[1], "background-color: black")
-        self.drawMap(self.robot.start_coordinate[0], self.robot.start_coordinate[1], "background-color: deeppink")
+        x,y = self.robot.start_coordinate
+        self.drawMap(x, y, "background-color: deeppink")
+        self.NowX.setText(str(x))
+        self.NowY.setText(str(y))
+
+    def moveStartPoint(self):
+        x = int(self.NowX.text())
+        y = int(self.NowY.text())
+        self.drawMap(x, y, "background-color: deeppink")
+        self.robot.start_coordinate = (x,y)
+        self.robot.current_coordinate = (x,y)
 
 #取出RenowXYZABC的數值，回傳給NowX.Y.Z.A.B.C
     def GetValue(self):
@@ -117,25 +127,40 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
     # 按鍵上下左右控制掃地機器人
     def Up(self):
-        YValue=self.NowY.text()
-        YValue=int(YValue)+1
-        YValue=str(YValue)
-        self.NowY.setText(YValue)
+        if self.robot.check_up():
+            self.drawMap(int(self.NowX.text()), int(self.NowY.text()), "background-color: white")
+            YValue=self.NowY.text()
+            YValue=int(YValue)-1
+            YValue=str(YValue)
+            self.NowY.setText(YValue)
+            self.moveStartPoint()
+
     def Down(self):
-        YValue=self.NowY.text()
-        YValue=int(YValue)-1
-        YValue=str(YValue)
-        self.NowY.setText(YValue)
+        if self.robot.check_down():
+            self.drawMap(int(self.NowX.text()), int(self.NowY.text()), "background-color: white")
+            YValue=self.NowY.text()
+            YValue=int(YValue)+1
+            YValue=str(YValue)
+            self.NowY.setText(YValue)
+            self.moveStartPoint()
+
     def Right(self):
-        XValue=self.NowX.text()
-        XValue=int(XValue)+1
-        XValue=str(XValue)
-        self.NowX.setText(XValue)
+        if self.robot.check_right():
+            self.drawMap(int(self.NowX.text()), int(self.NowY.text()), "background-color: white")
+            XValue=self.NowX.text()
+            XValue=int(XValue)+1
+            XValue=str(XValue)
+            self.NowX.setText(XValue)
+            self.moveStartPoint()
+
     def Left(self):
-        XValue=self.NowX.text()
-        XValue=int(XValue)-1
-        XValue=str(XValue)
-        self.NowX.setText(XValue)
+        if self.robot.check_left():
+            self.drawMap(int(self.NowX.text()), int(self.NowY.text()), "background-color: white")
+            XValue=self.NowX.text()
+            XValue=int(XValue)-1
+            XValue=str(XValue)
+            self.NowX.setText(XValue)
+            self.moveStartPoint()
 
     # 預約清掃功能(還沒有做鬧鐘功能)
     def AddTimeList(self):
