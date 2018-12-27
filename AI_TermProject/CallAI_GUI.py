@@ -89,6 +89,15 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
     def GetFile(self):
         for impassable in self.robot.impassable_coordinate_list:
             self.drawMap(impassable[0], impassable[1], "background-color: black")
+        for coordinate in self.robot.coordinate_list:
+            if coordinate not in self.robot.impassable_coordinate_list:
+                if self.robot.coordinate_data[coordinate[0]][coordinate[1]]['a'] == 2:#毛毯
+                    self.drawMap(coordinate[0], coordinate[1], "background-color: blue")
+                elif self.robot.coordinate_data[coordinate[0]][coordinate[1]]['a'] == 3:#灰塵
+                    self.drawMap(coordinate[0], coordinate[1], "background-color: yellow")
+                elif self.robot.coordinate_data[coordinate[0]][coordinate[1]]['a'] == 4:#毛髮
+                    self.drawMap(coordinate[0], coordinate[1], "background-color: pink")
+
         x, y = self.robot.start_coordinate
         self.drawMap(x, y, "background-color: deeppink")
         self.NowX.setText(str(x))
