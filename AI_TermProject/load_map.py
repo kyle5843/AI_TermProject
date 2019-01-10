@@ -30,4 +30,7 @@ for x in range(len(mapData)):
         posY = mapData[x][y]['y']
         posY = abs(30 - posY)
         coordinate_data[posX][posY] = mapData[x][y]
+        if coordinate_data[posX][posY]['a'] == 6:
+            impassable_coordinate_list.append((posX, posY))
+
 

@@ -96,6 +96,9 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                 self.drawMap(coordinate[0], coordinate[1], "background-color: yellow")
             elif self.robot.coordinate_data[coordinate[0]][coordinate[1]]['a'] == 4:#毛髮
                 self.drawMap(coordinate[0], coordinate[1], "background-color: pink")
+            elif self.robot.coordinate_data[coordinate[0]][coordinate[1]]['a'] == 6:#家具
+                self.drawMap(coordinate[0], coordinate[1], "background-color: brown")
+
 
         x, y = self.robot.start_coordinate
         self.drawMap(x, y, "background-color: deeppink")
