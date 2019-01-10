@@ -240,7 +240,7 @@ class Ui_MainWindow(object):
         self.label_19.setGeometry(QtCore.QRect(20, 530, 71, 23))
         self.label_19.setObjectName("label_19")
         self.Map = QtWidgets.QLabel(self.centralwidget)
-        self.Map.setGeometry(QtCore.QRect(60, 70, 504, 431))
+        self.Map.setGeometry(QtCore.QRect(60, 70, 518, 431))
         font = QtGui.QFont()
         font.setPointSize(15)
         self.Map.setFont(font)
