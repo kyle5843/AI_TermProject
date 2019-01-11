@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
+import datetime
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -15,9 +16,13 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         # robot
         self.robot = Robot()
         self.move_distance = 0
+        self.clearSize = 0
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.move)
         self.dirtyData = self.robot.coordinate_data
+        self.clearTimes = 0
+        self.power = 100
+        self.startTime = 0
 
         # 以下為自定義的函數及新增內容
         self.BtnInputMap.clicked.connect(self.GetFile)
@@ -33,6 +38,9 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
     # 跑路徑
     def Start(self):
+        self.clearTimes = self.clearTimes + 1
+        self.CleanFrequency.setText(str(self.clearTimes))
+        self.startTime = datetime.datetime.now()
         self.robot.getPath()
         self.timer.start(100)
 
@@ -48,15 +56,22 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             if dirty == 3:
                 self.drawMap(step[0], step[1], "background-color: darkgreen")
                 self.dirtyData[step[0]][step[1]]['b'] = dirty - 1
+                self.clearSize = self.clearSize + 1
+                self.power = self.power - 0.05
             elif dirty == 2:
                 self.drawMap(step[0], step[1], "background-color: green")
                 self.dirtyData[step[0]][step[1]]['b'] = dirty - 1
+                self.clearSize = self.clearSize + 1
+                self.power = self.power - 0.05
             elif dirty == 1:
                 self.drawMap(step[0], step[1], "background-color: darkcyan")
                 self.dirtyData[step[0]][step[1]]['b'] = dirty - 1
+                self.clearSize = self.clearSize + 1
+                self.power = self.power - 0.05
             else:
                 self.drawMap(step[0], step[1], "background-color: deeppink")
                 self.move_distance = self.move_distance + 1
+                self.power = self.power - 0.1
         else:
             self.timer.stop()
 
@@ -66,7 +81,12 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         if step not in self.robot.clearArea:
             self.robot.clearArea.append(step)
             self.CleanArea.setText(str(len(self.robot.clearArea)))
-        self.GoalProbability.setText(str("%.0f%%" % (100 * self.robot.cleanSensor.getCleanAreaPercentage(self.robot))))
+        now = datetime.datetime.now()
+        diffSeconds = (now - self.startTime).total_seconds()
+        self.CleanTime.setText("{:.2f}".format(diffSeconds)+"秒")
+        self.Power.setText("{:.2f}".format(self.power)+"%")
+        self.CleanProbability.setText("{:.2f}".format(100 * self.robot.cleanSensor.getTotalDirtyCleanPercentage(self.robot,self.clearSize)) + "%")
+        self.GoalProbability.setText("{:.2f}".format(100 * self.robot.cleanSensor.getCleanAreaPercentage(self.robot)))
         self.NowX.setText(str(step[0]))
         self.NowY.setText(str(step[1]))
         self.NowZ.setText(str(0))
@@ -95,6 +115,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.NowB.setText("")
         self.NowC.setText("")
         self.move_distance = 0
+        self.clearSize = 0
         self.drawMap(self.robot.current_coordinate[0], self.robot.current_coordinate[1], "background-color: deeppink")
         self.dirtyData = self.robot.coordinate_data
         self.robot.reset()
@@ -121,6 +142,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.NowA.setText(str(self.robot.coordinate_data[x][y]['a']))
         self.NowB.setText(str(self.robot.coordinate_data[x][y]['b']))
         self.NowC.setText(str(self.robot.coordinate_data[x][y]['c']))
+        self.Power.setText("100%")
         self.repaint()
 
     def moveStartPoint(self):

@@ -10,6 +10,7 @@ class Robot(object):
         self.coordinate_data = coordinate_data
         self.coordinate_list = coordinate_list
         self.impassable_coordinate_list = impassable_coordinate_list
+        self.totalDirty = 662
         self.start_coordinate = (27, 24)
         self.current_coordinate = self.start_coordinate
         self.path_log = []

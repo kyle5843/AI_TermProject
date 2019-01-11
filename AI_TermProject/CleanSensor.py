@@ -22,6 +22,9 @@ class CleanSensor(object):
     def getCleanAreaPercentage(self, robot):
         return len(robot.clearArea) / self.Area()
 
+    def getTotalDirtyCleanPercentage(self, robot, clearSize):
+        return clearSize / robot.totalDirty
+
     #需要掛在astar啟動時?   self.Distance.setText(str(self.CalDis()))
     def CalDis(self):
         self.distance = self.distance + 1
