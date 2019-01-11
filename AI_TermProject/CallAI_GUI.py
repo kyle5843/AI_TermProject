@@ -17,6 +17,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.move_distance = 0
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.move)
+        self.dirtyData = self.robot.coordinate_data
 
         # 以下為自定義的函數及新增內容
         self.BtnInputMap.clicked.connect(self.GetFile)
@@ -33,7 +34,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
     # 跑路徑
     def Start(self):
         self.robot.getPath()
-        self.timer.start(30)
+        self.timer.start(100)
 
     def move(self):
         if self.move_distance < len(self.robot.path_log):
@@ -41,10 +42,21 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
                 pre_step = self.robot.path_log[self.move_distance-1]
                 self.drawMap(pre_step[0], pre_step[1], "background-color: darkcyan")
             step = self.robot.path_log[self.move_distance]
-            self.drawMap(step[0], step[1], "background-color: deeppink")
-            self.move_distance = self.move_distance + 1
             self.updateStatus(step)
 
+            dirty = self.dirtyData[step[0]][step[1]]['b']
+            if dirty == 3:
+                self.drawMap(step[0], step[1], "background-color: darkgreen")
+                self.dirtyData[step[0]][step[1]]['b'] = dirty - 1
+            elif dirty == 2:
+                self.drawMap(step[0], step[1], "background-color: green")
+                self.dirtyData[step[0]][step[1]]['b'] = dirty - 1
+            elif dirty == 1:
+                self.drawMap(step[0], step[1], "background-color: darkcyan")
+                self.dirtyData[step[0]][step[1]]['b'] = dirty - 1
+            else:
+                self.drawMap(step[0], step[1], "background-color: deeppink")
+                self.move_distance = self.move_distance + 1
         else:
             self.timer.stop()
 
@@ -59,7 +71,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.NowY.setText(str(step[1]))
         self.NowZ.setText(str(0))
         self.NowA.setText(str(self.robot.coordinate_data[step[0]][step[1]]['a']))
-        self.NowB.setText(str(self.robot.coordinate_data[step[0]][step[1]]['b']))
+        self.NowB.setText(str(self.dirtyData[step[0]][step[1]]['b']))
         self.NowC.setText(str(self.robot.coordinate_data[step[0]][step[1]]['c']))
 
     def drawMap(self, posX, posY, color):
@@ -84,6 +96,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.NowC.setText("")
         self.move_distance = 0
         self.drawMap(self.robot.current_coordinate[0], self.robot.current_coordinate[1], "background-color: deeppink")
+        self.dirtyData = self.robot.coordinate_data
         self.robot.reset()
 
     def GetFile(self):
@@ -93,9 +106,9 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
             if self.robot.coordinate_data[coordinate[0]][coordinate[1]]['a'] == 2:#毛毯
                 self.drawMap(coordinate[0], coordinate[1], "background-color: blue")
             elif self.robot.coordinate_data[coordinate[0]][coordinate[1]]['a'] == 3:#灰塵
-                self.drawMap(coordinate[0], coordinate[1], "background-color: yellow")
+                self.drawMap(coordinate[0], coordinate[1], "background-color: gray")
             elif self.robot.coordinate_data[coordinate[0]][coordinate[1]]['a'] == 4:#毛髮
-                self.drawMap(coordinate[0], coordinate[1], "background-color: pink")
+                self.drawMap(coordinate[0], coordinate[1], "background-color: purple")
             elif self.robot.coordinate_data[coordinate[0]][coordinate[1]]['a'] == 6:#家具
                 self.drawMap(coordinate[0], coordinate[1], "background-color: brown")
 
