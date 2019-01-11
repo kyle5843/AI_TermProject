@@ -73,6 +73,9 @@ def getWeight(self, coordinate2):
     if down_coordinate not in self.coordinate_list or (down_coordinate in self.impassable_coordinate_list) or down_coordinate in self.path_log:
         weight = weight + 1
 
+    if self.coordinate_data[x][y]['b'] == 3:
+        weight = weight + 2
+
     if weight == 4 or weight == 3:
         return 2.5
     else:
