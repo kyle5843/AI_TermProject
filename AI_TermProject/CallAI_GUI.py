@@ -3,25 +3,33 @@
 import sys
 import datetime
 from PyQt5.QtCore import *
-from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from AI_GUI import *
 from Robot import *
 
+BG_White = "background-color: white"
+BG_Black = "background-color: black"
+BG_BLUE = "background-color: blue"
+BG_GRAY = "background-color: gray"
+BG_BROWN = "background-color: brown"
+BG_PURPLE = "background-color: purple"
+BG_DirtyL3 = "background-color: darkgreen"
+BG_DirtyL2 = "background-color: green"
+BG_DirtyL1 = "background-color: darkcyan"
+BG_Passed = "background-color: darkcyan"
+BG_Robot = "background-color: deeppink"
+
 class MyMainWindow(QMainWindow, Ui_MainWindow):
+
     def __init__(self, parent=None):    
         super(MyMainWindow, self).__init__(parent)
         self.setupUi(self)
 
         # robot
         self.robot = Robot()
-        self.move_distance = 0
-        self.clearSize = 0
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.move)
-        self.dirtyData = self.robot.coordinate_data
         self.clearTimes = 0
-        self.power = 100
         self.startTime = 0
 
         # 以下為自定義的函數及新增內容
@@ -45,54 +53,50 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
         self.timer.start(100)
 
     def move(self):
-        if self.move_distance < len(self.robot.path_log):
-            if (self.move_distance-1) >= 0:
-                pre_step = self.robot.path_log[self.move_distance-1]
-                self.drawMap(pre_step[0], pre_step[1], "background-color: darkcyan")
-            step = self.robot.path_log[self.move_distance]
+        distance = self.robot.cleanSensor.distance
+        if distance < len(self.robot.path_log):
+            if (distance - 1) >= 0:
+                pre_step = self.robot.path_log[distance - 1]
+                self.drawMap(pre_step[0], pre_step[1], BG_Passed)
+            step = self.robot.path_log[distance]
             self.updateStatus(step)
 
-            dirty = self.dirtyData[step[0]][step[1]]['b']
-            if dirty == 3:
-                self.drawMap(step[0], step[1], "background-color: darkgreen")
-                self.dirtyData[step[0]][step[1]]['b'] = dirty - 1
-                self.clearSize = self.clearSize + 1
-                self.power = self.power - 0.05
-            elif dirty == 2:
-                self.drawMap(step[0], step[1], "background-color: green")
-                self.dirtyData[step[0]][step[1]]['b'] = dirty - 1
-                self.clearSize = self.clearSize + 1
-                self.power = self.power - 0.05
-            elif dirty == 1:
-                self.drawMap(step[0], step[1], "background-color: darkcyan")
-                self.dirtyData[step[0]][step[1]]['b'] = dirty - 1
-                self.clearSize = self.clearSize + 1
-                self.power = self.power - 0.05
+            x, y = step
+            dirtyLevel = self.robot.cleanSensor.checkDirtyLevel(x, y)
+            if dirtyLevel == 3:
+                self.drawMap(x, y, BG_DirtyL3)
+                self.robot.clean(x, y)
+            elif dirtyLevel == 2:
+                self.drawMap(x, y, BG_DirtyL2)
+                self.robot.clean(x, y)
+            elif dirtyLevel == 1:
+                self.drawMap(x, y, BG_DirtyL1)
+                self.robot.clean(x, y)
             else:
-                self.drawMap(step[0], step[1], "background-color: deeppink")
-                self.move_distance = self.move_distance + 1
-                self.power = self.power - 0.1
+                self.drawMap(x, y, BG_Robot)
+                self.robot.move()
         else:
             self.timer.stop()
 
     def updateStatus(self, step):
         # update Status
-        self.Distance.setText(str(self.move_distance))
+        self.Distance.setText(str(self.robot.cleanSensor.distance))
+        x, y = step
         if step not in self.robot.clearArea:
             self.robot.clearArea.append(step)
             self.CleanArea.setText(str(len(self.robot.clearArea)))
         now = datetime.datetime.now()
         diffSeconds = (now - self.startTime).total_seconds()
         self.CleanTime.setText("{:.2f}".format(diffSeconds)+"秒")
-        self.Power.setText("{:.2f}".format(self.power)+"%")
-        self.CleanProbability.setText("{:.2f}".format(100 * self.robot.cleanSensor.getTotalDirtyCleanPercentage(self.robot,self.clearSize)) + "%")
-        self.GoalProbability.setText("{:.2f}".format(100 * self.robot.cleanSensor.getCleanAreaPercentage(self.robot)))
-        self.NowX.setText(str(step[0]))
-        self.NowY.setText(str(step[1]))
+        self.Power.setText("{:.2f}".format(self.robot.power)+"%")
+        self.CleanProbability.setText("{:.2f}".format(100 * self.robot.cleanSensor.getTotalDirtyCleanPercentage()) + "%")
+        self.GoalProbability.setText("{:.2f}".format(100 * self.robot.cleanSensor.getCleanAreaPercentage()) + "%")
+        self.NowX.setText(str(x))
+        self.NowY.setText(str(y))
         self.NowZ.setText(str(0))
-        self.NowA.setText(str(self.robot.coordinate_data[step[0]][step[1]]['a']))
-        self.NowB.setText(str(self.dirtyData[step[0]][step[1]]['b']))
-        self.NowC.setText(str(self.robot.coordinate_data[step[0]][step[1]]['c']))
+        self.NowA.setText(str(self.robot.detectObstructionType(x, y)))
+        self.NowB.setText(str(self.robot.cleanSensor.checkDirtyLevel(x, y)))
+        self.NowC.setText(str(0))
 
     def drawMap(self, posX, posY, color):
         self.lableX = QtWidgets.QLabel(self.layoutWidget)
@@ -103,60 +107,55 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
     def clearMap(self):
         for coordinate in self.robot.coordinate_list:
             if coordinate not in self.robot.impassable_coordinate_list:
-                x,y = coordinate
-                self.drawMap(x, y, "background-color: white")
+                x, y = coordinate
+                self.drawMap(x, y, BG_White)
+        x, y = self.robot.current_coordinate
         self.Distance.setText("")
         self.CleanArea.setText("")
         self.GoalProbability.setText("")
-        self.NowX.setText(str(self.robot.current_coordinate[0]))
-        self.NowY.setText(str(self.robot.current_coordinate[1]))
+        self.NowX.setText(str(x))
+        self.NowY.setText(str(y))
         self.NowZ.setText("")
         self.NowA.setText("")
         self.NowB.setText("")
         self.NowC.setText("")
-        self.move_distance = 0
-        self.clearSize = 0
-        self.drawMap(self.robot.current_coordinate[0], self.robot.current_coordinate[1], "background-color: deeppink")
-        self.dirtyData = self.robot.coordinate_data
+        self.drawMap(x, y, BG_Robot)
         self.robot.reset()
 
     def GetFile(self):
-        for impassable in self.robot.impassable_coordinate_list:
-            self.drawMap(impassable[0], impassable[1], "background-color: black")
         for coordinate in self.robot.coordinate_list:
-            if self.robot.coordinate_data[coordinate[0]][coordinate[1]]['a'] == 2:#毛毯
-                self.drawMap(coordinate[0], coordinate[1], "background-color: blue")
-            elif self.robot.coordinate_data[coordinate[0]][coordinate[1]]['a'] == 3:#灰塵
-                self.drawMap(coordinate[0], coordinate[1], "background-color: gray")
-            elif self.robot.coordinate_data[coordinate[0]][coordinate[1]]['a'] == 4:#毛髮
-                self.drawMap(coordinate[0], coordinate[1], "background-color: purple")
-            elif self.robot.coordinate_data[coordinate[0]][coordinate[1]]['a'] == 6:#家具
-                self.drawMap(coordinate[0], coordinate[1], "background-color: brown")
-
+            self.drawMapWithColor(coordinate[0], coordinate[1])
 
         x, y = self.robot.start_coordinate
-        self.drawMap(x, y, "background-color: deeppink")
+        self.drawMap(x, y, BG_Robot)
         self.NowX.setText(str(x))
         self.NowY.setText(str(y))
-        self.NowZ.setText(str(self.robot.coordinate_data[x][y]['z']))
-        self.NowA.setText(str(self.robot.coordinate_data[x][y]['a']))
+        self.NowZ.setText(str(0))
+        self.NowA.setText(str(self.robot.detectObstructionType(x, y)))
         self.NowB.setText(str(self.robot.coordinate_data[x][y]['b']))
-        self.NowC.setText(str(self.robot.coordinate_data[x][y]['c']))
+        self.NowC.setText(str(0))
         self.Power.setText("100%")
+        self.CleanTime.setText("")
+        self.CleanProbability.setText("")
+        self.GoalProbability.setText("")
         self.repaint()
 
-    def moveStartPoint(self):
-        x = int(self.NowX.text())
-        y = int(self.NowY.text())
-        self.NowZ.setText(str(self.robot.coordinate_data[x][y]['z']))
-        self.NowA.setText(str(self.robot.coordinate_data[x][y]['a']))
-        self.NowB.setText(str(self.robot.coordinate_data[x][y]['b']))
-        self.NowC.setText(str(self.robot.coordinate_data[x][y]['c']))
-        self.drawMap(x, y, "background-color: deeppink")
-        self.robot.start_coordinate = (x,y)
-        self.robot.current_coordinate = (x,y)
+    def drawMapWithColor(self, x, y):
+        obstructionType = self.robot.detectObstructionType(x, y)
+        if obstructionType == 2: #毛毯
+            self.drawMap(x, y, BG_BLUE)
+        elif obstructionType == 3: #灰塵
+            self.drawMap(x, y, BG_GRAY)
+        elif obstructionType == 4: #毛髮
+            self.drawMap(x, y, BG_PURPLE)
+        elif obstructionType == 6: #家具
+            self.drawMap(x, y, BG_BROWN)
+        elif (x, y) in self.robot.impassable_coordinate_list: #牆壁
+            self.drawMap(x, y, BG_Black)
+        else:
+            self.drawMap(x, y, BG_White)
 
-#取出RenowXYZABC的數值，回傳給NowX.Y.Z.A.B.C
+    # 更新位置
     def GetValue(self):
         XValue=self.RenewX.text()
         self.NowX.setText(XValue)
@@ -183,7 +182,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
     # 按鍵上下左右控制掃地機器人
     def Up(self):
         if self.robot.check_up():
-            self.drawMap(int(self.NowX.text()), int(self.NowY.text()), "background-color: white")
+            self.drawMapWithColor(int(self.NowX.text()), int(self.NowY.text()))
             YValue=self.NowY.text()
             YValue=int(YValue)-1
             YValue=str(YValue)
@@ -193,7 +192,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
     def Down(self):
         if self.robot.check_down():
-            self.drawMap(int(self.NowX.text()), int(self.NowY.text()), "background-color: white")
+            self.drawMapWithColor(int(self.NowX.text()), int(self.NowY.text()))
             YValue=self.NowY.text()
             YValue=int(YValue)+1
             YValue=str(YValue)
@@ -203,7 +202,7 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
     def Right(self):
         if self.robot.check_right():
-            self.drawMap(int(self.NowX.text()), int(self.NowY.text()), "background-color: white")
+            self.drawMapWithColor(int(self.NowX.text()), int(self.NowY.text()))
             XValue=self.NowX.text()
             XValue=int(XValue)+1
             XValue=str(XValue)
@@ -213,13 +212,24 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
 
     def Left(self):
         if self.robot.check_left():
-            self.drawMap(int(self.NowX.text()), int(self.NowY.text()), "background-color: white")
+            self.drawMapWithColor(int(self.NowX.text()), int(self.NowY.text()))
             XValue=self.NowX.text()
             XValue=int(XValue)-1
             XValue=str(XValue)
             self.NowX.setText(XValue)
             self.moveStartPoint()
             self.repaint()
+
+    def moveStartPoint(self):
+        x = int(self.NowX.text())
+        y = int(self.NowY.text())
+        self.NowZ.setText(str(0))
+        self.NowA.setText(str(self.robot.detectObstructionType(x, y)))
+        self.NowB.setText(str(self.robot.cleanSensor.checkDirtyLevel(x, y)))
+        self.NowC.setText(str(0))
+        self.drawMap(x, y, BG_Robot)
+        self.robot.start_coordinate = (x, y)
+        self.robot.current_coordinate = (x, y)
 
     # 預約清掃功能(還沒有做鬧鐘功能)
     def AddTimeList(self):
@@ -243,22 +253,6 @@ class MyMainWindow(QMainWindow, Ui_MainWindow):
     def DelTimeList(self):
         NowRow=self.listWidget.currentRow()
         self.listWidget.takeItem(NowRow)
-    # '''
-    
-    
-#在地圖上面顯示掃地的路徑，並回傳到GUI的Map參數上面
-#目前有這個功能，但是在另一個視窗= ="
-class Drawing(QWidget):
-    def paintEvent(self, e):
-        Map = QPainter()
-        Map.begin(self)
-        self.drawLines(Map)
-        Map.end()
-
-    def drawLines(self, Map):
-        brush = QBrush(Qt.SolidPattern)
-        Map.setBrush(brush)  # 設定畫筆風格
-        Map.drawRect(10, 15, 20, 40)  # 畫矩形(x,y,w,h)
 
 
 if __name__=="__main__":

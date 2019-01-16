@@ -71,3 +71,6 @@ def judge_left_passed(self):
     else:
         return False
 
+
+def detectObstructionType(self, x, y):
+    return self.coordinate_data[x][y]['a']

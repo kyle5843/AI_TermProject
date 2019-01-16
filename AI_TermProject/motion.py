@@ -4,25 +4,21 @@ import numpy as np
 
 def move_up(self):
     self.current_coordinate = tuple(np.array(self.current_coordinate) + np.array([0, 1]))
-    # print('up')
     self.path_log.append(self.current_coordinate)
 
 
 def move_down(self):
     self.current_coordinate = tuple(np.array(self.current_coordinate) + np.array([0, -1]))
-    # print('down')
     self.path_log.append(self.current_coordinate)
 
 
 def move_left(self):
     self.current_coordinate = tuple(np.array(self.current_coordinate) + np.array([-1, 0]))
-    # print('left')
     self.path_log.append(self.current_coordinate)
 
 
 def move_right(self):
     self.current_coordinate = tuple(np.array(self.current_coordinate) + np.array([1, 0]))
-    # print('right')
     self.path_log.append(self.current_coordinate)
 
 
@@ -85,3 +81,7 @@ def u_turn_toward_left(self):
             else:
                 rollback = False
                 break
+
+
+def doClean(self, x, y):
+    self.dirtyData[x][y]['b'] = self.dirtyData[x][y]['b'] - 1
