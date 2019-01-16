@@ -1,5 +1,6 @@
 
 import numpy as np
+import random
 
 
 def move_up(self):
@@ -23,10 +24,16 @@ def move_right(self):
 
 
 def u_turn(self):
-    if self.judge_up_passable() is True or self.judge_right_passable() is True or self.judge_down_passable():
-        self.u_turn_toward_right()
-    elif self.judge_up_passable() is True or self.judge_left_passable() is True or self.judge_down_passable():
-        self.u_turn_toward_left()
+    if random.randint(1, 2) == 1:
+        if self.judge_up_passable() is True or self.judge_right_passable() is True or self.judge_down_passable():
+            self.u_turn_toward_right()
+        elif self.judge_up_passable() is True or self.judge_left_passable() is True or self.judge_down_passable():
+            self.u_turn_toward_left()
+    else:
+        if self.judge_up_passable() is True or self.judge_left_passable() is True or self.judge_down_passable():
+            self.u_turn_toward_left()
+        elif self.judge_up_passable() is True or self.judge_right_passable() is True or self.judge_down_passable():
+            self.u_turn_toward_right()
 
 
 def u_turn_toward_right(self):
