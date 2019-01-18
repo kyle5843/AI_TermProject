@@ -2,6 +2,7 @@ from Sensor import *
 from Motion import *
 from A_Star import *
 from CleanSensor import *
+import copy
 
 MOVE_COST = 0.1
 CLEAN_COST = 0.05
@@ -20,7 +21,7 @@ class Robot(object):
         self.impassable_coordinate_list = impassable_coordinate_list
 
         # temp dirty data, reset every term
-        self.dirtyData = coordinate_data
+        self.dirtyData = copy.deepcopy(self.coordinate_data)
 
         # totalDirty = all dirty level's sum
         self.totalDirty = totalDirty
@@ -75,7 +76,7 @@ class Robot(object):
         self.path_log = []
         self.current_coordinate = self.start_coordinate
         self.clearArea = []
-        self.dirtyData = self.coordinate_data
+        self.dirtyData = copy.deepcopy(self.coordinate_data)
         self.power = 100
         self.cleanSensor.setRobot(self)
 
